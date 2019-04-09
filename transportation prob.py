@@ -1,8 +1,10 @@
 from pulp import *
 
+# listy wszystkich odbioróców i producentów
 shops = ['S1', 'S2', 'S3', 'S4']
 plants = ['P1', 'P2', 'P3']
 
+# Zapotrzebowanie i podaż
 demand = {
     'S1': 15,
     'S2': 19,
@@ -16,51 +18,49 @@ supply = {
     'P3': 17
 }
 
-# {'key': 'value'} - słownik, {'value1', 'value2'} - zbiór - http://thomas-cokelaer.info/tutorials/python/sets.html#id3
-# nie możesz używać w zbiorze list ani tupli (wszystkiego co może mieć ileś elementów)
+# Koszty jednostkowe
 costs = [
     [3, 6, 8, 4],
     [6, 1, 2, 5],
     [7, 8, 3, 9]
 ]
 
-# W sumie to nie musisz tutaj podawać ani nazwy (jest tylko dla Ciebie) ani LpMinimize - jest domyślne.
-# Możesz zostawić żeby było czytelniej - będzie git.
-# https://www.coin-or.org/PuLP/pulp.html#the-lpproblem-class
+# Deklaracja problemu optymalizacji - szukanie minima
 prob = LpProblem("Transportation costs", LpMinimize)
 
-# W ich poradniku shop i plant są odwrotnie jak u Ciebie
+# Połączenia między dostawcami a sklepami - każdy z każdym
 routes = [(plant, shop) for shop in shops for plant in plants]
 
+# Stworzenie nazw zmiennych do optymalizacji - np. Route_P1_S4 - liczba przetransportowanych towarów w zakresie od 0 do inf, liczba całkowita
 route_vars = LpVariable.dicts('Route', (plants, shops), 0, None, LpInteger)
 
-# Troche pomieszałeś indexy 'i', 'j' wraz z 'w', 'b'
-# łatwiej będzie rozbic to na stworzenie macierzy kosztów i zastosowanie funkcji lpSum
-
-#1. 'w', 'b' to trzeba przeroobić  costs tak
-# tmp = [route_vars[plant][shop] * costs[plant][shop] for (plant, shop) in routes]
-
+# Deklarowanie funkcji celu do zoptymalizowania
 tmp = []
 for i, shop in enumerate(shops):
     for j, plant in enumerate(plants):
         tmp.append(route_vars[plant][shop] * costs[j][i])
 prob += lpSum(tmp)
 
+# Definiowanie ograniczeń ( == demand[shop] jest warunkiem do spełnienia)
 for shop in shops:
     prob += lpSum(route_vars[plant][shop] for plant in plants) == demand[shop]
 
 for plant in plants:
     prob += lpSum(route_vars[plant][shop] for shop in shops) == supply[plant]
 
+# Odpalenie solvera
 prob.solve()
+
+# Wyświetl problem
 print(prob)
-# The status of the solution is printed to the screen
+
+# Wyświetl status
 print("Status:", LpStatus[prob.status])
 
-# Each of the variables is printed with it's resolved optimum value
+# Wyświetl przetransportowanie ilości dla każdego połączenia
 for v in prob.variables():
     print(v.name, "=", v.varValue)
 
-# The optimised objective function value is printed to the screen
+# Koszt całkowity
 print("Total Cost of Transportation = ", value(prob.objective))
 
