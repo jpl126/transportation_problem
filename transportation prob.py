@@ -1,29 +1,58 @@
 from pulp import *
 
-# listy wszystkich odbioróców i producentów
-shops = ['S1', 'S2', 'S3', 'S4']
-plants = ['P1', 'P2', 'P3']
+# # listy wszystkich odbioróców i producentów
+# shops = ['S1', 'S2', 'S3', 'S4']
+# plants = ['P1', 'P2', 'P3']
 
-# Zapotrzebowanie i podaż
-demand = {
-    'S1': 15,
-    'S2': 19,
-    'S3': 13,
-    'S4': 18,
-}
 
-supply = {
-    'P1': 20,
-    'P2': 28,
-    'P3': 17
-}
+def pobierz_dane() -> dict:
+    shops_ = []
+    plants_ = []
+    demand_ = {}
+    supply_ = {}
+    costs_ = []
 
-# Koszty jednostkowe
-costs = [
-    [3, 6, 8, 4],
-    [6, 1, 2, 5],
-    [7, 8, 3, 9]
-]
+    shops_no = int(input('Podaj liczbe odbiorców: '))
+    plants_no = int(input('Podaj liczbe dostawców: '))
+
+    for i in range(shops_no):
+        name = 'S' + str(i + 1) # numerowanie od 1
+        shops_.append(name)
+        demand_[name] = int(input(f'Podaj zapotrzebowanie dla odbiorcy {name}: '))
+
+    for i in range(plants_no):
+        name = 'P' + str(i + 1) # numerowanie od 1
+        plants_.append(name)
+        supply_[name] = int(input(f'Podaj zapotrzebowanie dla dostawcy {name}: '))
+
+    costs_ =
+
+    return shops_, plants_, demand_, supply_, costs_
+
+
+
+shops, plants, demand, supply, costs = pobierz_dane()
+
+# # Zapotrzebowanie i podaż
+# demand = {
+#     'S1': 15,
+#     'S2': 19,
+#     'S3': 13,
+#     'S4': 18,
+# }
+#
+# supply = {
+#     'P1': 20,
+#     'P2': 28,
+#     'P3': 17
+# }
+#
+# # Koszty jednostkowe
+# costs = [
+#     [3, 6, 8, 4],
+#     [6, 1, 2, 5],
+#     [7, 8, 3, 9]
+# ]
 
 # Deklaracja problemu optymalizacji - szukanie minima
 prob = LpProblem("Transportation costs", LpMinimize)
